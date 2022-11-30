@@ -63,9 +63,13 @@ void gpuThread(int N, int *matA, int *matB, int *output)
 	int thread_blocks=((N>>1)*(N>>1)+THREAD_PER_THREAD_BLOCK-1)/THREAD_PER_THREAD_BLOCK;
 	dot_product<<<thread_blocks, THREAD_PER_THREAD_BLOCK>>>(d_a, d_b, d_output, N);
 	
+	cudaDeviceSynchronize();
 	if(cudaMemcpy(output, d_output, sizeof(int)*(N>>1)*(N>>1), cudaMemcpyDeviceToHost)!=cudaSuccess)
 	{
 		cout<<"Error copying output matrix from GPU to host"<<endl;
 		exit(1);
 	}
+	cudaFree(d_a);
+        cudaFree(d_b);
+        cudaFree(d_output);
 }
